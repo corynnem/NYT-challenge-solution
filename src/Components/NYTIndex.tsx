@@ -1,4 +1,4 @@
-import React, { BaseSyntheticEvent, Component } from 'react'
+import React, { BaseSyntheticEvent, Component, SyntheticEvent } from 'react'
 import { Input } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -12,6 +12,7 @@ class NYTDisplay extends Component<{}, IState>{
             query: '',
             startDate: '',
             endDate: '',
+            pageNumber: 0,
             response: {
                 response: {
                     docs: []
@@ -36,13 +37,30 @@ class NYTDisplay extends Component<{}, IState>{
             url = `${url}&end_date=${this.state.endDate}`
         }
         
-        let finalURL = `${url}q=${this.state.query}&api-key=${key}`
+        if(this.state.startDate === '' && this.state.endDate === ''){
+            url = baseURL
+        }
+
+        let finalURL = `${url}q=${this.state.query}&api-key=${key}&page=${this.state.pageNumber}`
         console.log(finalURL)
+        setTimeout(() => {
         fetch(finalURL, {
             method: 'GET'
         }).then(response => response.json())
             .then((response) => this.displayResults(response))
             .catch((e) => console.log(e))
+        }, 250)
+    }
+
+    nextPage = (e: BaseSyntheticEvent) => {
+        let newPage = this.state.pageNumber
+        this.setState({ pageNumber: newPage += 2})
+        this.fetchResults(e)
+    }
+    lastPage = (e: BaseSyntheticEvent) => {
+        let newPage = this.state.pageNumber
+        this.setState({ pageNumber: newPage -= 1})
+        this.fetchResults(e)
     }
 
     displayResults(response: IResults) {
@@ -95,12 +113,14 @@ class NYTDisplay extends Component<{}, IState>{
                     <br />
                     <br />
                     <Button variant="contained" type="submit">Submit</Button>
-                </form>
+                    </form>
+                    <Button variant="contained" onClick={(e) => this.lastPage(e)}>last</Button>
+                    <Button variant="contained" onClick={(e) => this.nextPage(e)}>next</Button>
                 <div>
                 
                     {
                        this.state.response?.response?.docs?.map((article: IArticle, index) => {
-                         console.log(article)
+                     
                             return (
                                <div>
                                    <Display article={article} index={index}/>
@@ -109,7 +129,8 @@ class NYTDisplay extends Component<{}, IState>{
                         })}
                 </div>
 
-
+               
+              
             </div>
         )
     }

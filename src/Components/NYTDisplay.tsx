@@ -17,7 +17,7 @@ const Display = (props: IProps) => {
         index
     } = props
 
-    console.log(props)
+    // console.log(props)
 
     return (
   

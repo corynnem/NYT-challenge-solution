@@ -33,12 +33,13 @@ export interface IState {
     startDate?: string,
     endDate?: string,
     response?: IResults,
+    pageNumber: number
 }
 
 
 export interface IValue{
-    value: '',
-    name: ''
+    value: string,
+    name: string
 }
 
 
